@@ -139,10 +139,11 @@ func Update_POST(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, fmt.Sprint("/error?q=", err), http.StatusSeeOther)
 	}
 
-	err = sqldb.Update(r.Form["Name"][0], r.Form["Content"][0], id)
+	if err = sqldb.Update(r.Form["Name"][0], r.Form["Content"][0], id); err != nil {
 
-	if err != nil {
 		http.Redirect(w, r, fmt.Sprint("/error?q=", err), http.StatusSeeOther)
+		return
+
 	}
 
 	http.Redirect(w, r, "/read", http.StatusSeeOther)
