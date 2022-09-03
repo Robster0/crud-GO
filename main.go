@@ -10,40 +10,36 @@ import (
 	"github.com/robster0/crud/controllers"
 )
 
-type Page struct {
-	Title string
-}
+/*func CatchAll_URL(next http.Handler) http.Handler {
+	fmt.Println("wow")
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r)
+	})
+}*/
 
 func main() {
 	os.Setenv("dbpw", trickster())
 	r := mux.NewRouter()
-
-	//fs := http.FileServer(http.Dir("./static/"))
-	//r.Handle("/static/", http.StripPrefix("/static/", fs))
+	//r.Use(CatchAll_URL)
+	//controllers.DB = sqldb.Open()
 
 	s := http.StripPrefix("/static/", http.FileServer(http.Dir("./static/")))
 	r.PathPrefix("/static/").Handler(s)
 
-	http.Handle("/", r)
-
 	r.HandleFunc("/", controllers.Home_GET).Methods("GET")
 	r.HandleFunc("/create", controllers.Create_GET).Methods("GET")
 	r.HandleFunc("/read", controllers.Read_GET).Methods("GET")
-	r.HandleFunc("/update", controllers.Update_GET).Methods("GET")
-	r.HandleFunc("/delete", controllers.Delete_GET).Methods("GET")
+	r.HandleFunc("/read/{id}", controllers.ReadOne_GET).Methods("GET")
+	r.HandleFunc("/update/{id}", controllers.Update_GET).Methods("GET")
+	r.HandleFunc("/delete/{id}", controllers.Delete_GET).Methods("GET")
 	r.HandleFunc("/error", controllers.Error_GET).Methods("GET")
 
 	r.HandleFunc("/create", controllers.Create_POST).Methods("POST")
 	r.HandleFunc("/read", controllers.Read_POST).Methods("POST")
-	r.HandleFunc("/update", controllers.Update_POST).Methods("POST")
-	r.HandleFunc("/delete", controllers.Delete_POST).Methods("POST")
-	/*r.HandleFunc("/posts", home).Methods("GET")
-	r.HandleFunc("/create", home).Methods("GET")
-	/*r.HandleFunc("/update", home).Methods("GET")
-
-	r.HandleFunc("/posts", home).Methods("POST")
-	r.HandleFunc("/create", home).Methods("POST")
-	r.HandleFunc("/update", home).Methods("POST")*/
+	r.HandleFunc("/update/{id}", controllers.Update_POST).Methods("POST")
+	//r.HandleFunc("/delete", controllers.Delete_POST).Methods("POST")
+	r.NotFoundHandler = r.NewRoute().HandlerFunc(controllers.Error_GET).GetHandler()
 
 	fmt.Println("Starting server at port 3000")
 	log.Fatal(http.ListenAndServe(":3000", r))

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -7,10 +8,11 @@
 body, html {
     width: 100%;
     height: 100%;
-    display: grid;
-    font-family: 'Roboto Mono', monospace;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 .center {
+    width: 100%;
+    height: 100%;
     position: relative;
     display: flex;
     align-items: center;
@@ -18,10 +20,9 @@ body, html {
     flex-direction: column;
     gap: 50px;
     /*grid-template-rows: 100px 100px;*/
-    font-family: 'Roboto Mono', monospace;
     /*margin-top: 100px;*/
 }
-.center h1 {
+.center h2 {
     color: red;
 }
 .center img {
@@ -31,12 +32,18 @@ body, html {
 }
 
 .content{
-    border: solid 1px black;
-    width: 800px;
+    gap: 150px;
+    border: solid 1px rgba(0, 0, 0, 0.103);
+    width: 950px;
     height: 100%;
     display: grid;
+    grid-row-start: auto;
+    grid-template-rows: repeat(auto-fill, 240px);
     place-items: center;
     justify-content: center;
+    align-items: center;
+    background-color: white;
+    margin: auto;
 }
 .home {
     margin-top: 100px;
@@ -52,4 +59,96 @@ body, html {
     place-items: center;
     justify-content: center;
     gap: 40px;
+}
+.postBody {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    justify-content: center;
+}
+.post {
+    border: solid black 1px;
+    padding: 30px;
+    height: 244px;
+    width: 798px;
+    gap: 1px;
+    display: grid;
+    background-color: rgb(230, 215, 196);
+    border-radius: 2px;
+    
+}
+
+.post > div > .form-control:active, .post > div > .form-control:focus {
+    box-shadow: 0 0 4px 1px rgba(255, 82, 82, 0.349);
+    border: none;
+    outline: none;
+}
+.post textarea {
+    resize: none;
+    padding: 5px;
+}
+.post > textarea:focus, .post > textarea:active  {
+    box-shadow: 0 0 3px 1px rgba(255, 95, 95, 0.288);
+    outline: none;
+}
+.post a {
+    text-decoration: none;
+    color: red;
+}
+.post a:hover {
+    color: rgb(255, 104, 104);
+}
+.information {
+    display: grid;
+    grid-template-columns: 79% 50%;
+    justify-content:left;
+}
+.information h6 {
+  transform: translate(0, 19px);
+}
+.information h3 {
+  transform: translate(5px, 8px);
+}
+.ud {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-left: 450px;
+    justify-content:right;
+    place-items: center;
+    transform: translate(0, -8px);
+}
+.wrapper {
+    width: 948px;
+    height: 350px;
+    background-color: rgb(250, 250, 250);
+    display: grid;
+    justify-content: center;
+    place-items: center;
+    margin-top: 180px;
+}
+
+
+.wrapper:hover {
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+    background-color: rgb(247, 247, 247);
+}
+.update {
+    width: 100%;
+    height: 100%;
+}
+.update > .postBody > .content > .wrapper > .post   {
+   height: 280px;
+}
+.update > .postBody > .content > .wrapper > .post > .ud   {
+    transform: translate(0, -2px);
+ }
+.update > .postBody > .content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.update > .postBody > .content > .wrapper {
+    margin: 0;
 }
