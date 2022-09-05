@@ -17,6 +17,13 @@ type Post struct {
 	C       string
 	Created string
 }
+type Comment struct {
+	C_ID      int
+	PostID    int
+	C_N       string
+	C_C       string
+	C_Created string
+}
 
 func Open() *sql.DB {
 
@@ -40,7 +47,7 @@ func Open() *sql.DB {
 	return db
 }
 
-func Insert(n string, c string) error {
+func Insert(n string, c string, id int, v bool) error {
 
 	n = strings.TrimSpace(n)
 	c = strings.TrimSpace(c)
@@ -63,7 +70,13 @@ func Insert(n string, c string) error {
 
 	defer db.Close()
 
-	res, err := db.Exec("INSERT INTO posts (n, c, Created) VALUES (?, ?, ?)", n, c, time.Now().String()[0:19])
+	var res sql.Result
+
+	if v {
+		res, err = db.Exec("INSERT INTO posts (n, c, Created) VALUES (?, ?, ?)", n, c, time.Now().String()[0:19])
+	} else {
+		res, err = db.Exec("INSERT INTO comments (postid, c_n, c_c, c_Created) VALUES (?, ?, ?, ?)", id, n, c, time.Now().String()[0:19])
+	}
 
 	rows_affected, _ := res.RowsAffected()
 
@@ -132,6 +145,38 @@ func SelectOne(id int) (Post, error) {
 
 	return p, nil
 
+}
+
+func GetComments() ([]Comment, error) {
+	db, err := sql.Open("mysql", fmt.Sprint("root:", os.Getenv("dbpw"), "@tcp(localhost:3306)/crud_go"))
+	var comments []Comment
+
+	if err != nil {
+		return comments, fmt.Errorf("there seem to be an issue right now")
+	}
+
+	defer db.Close()
+
+	rows, err := db.Query("SELECT * FROM comments")
+
+	if err != nil {
+		return comments, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var c Comment
+
+		if err := rows.Scan(&c.C_ID, &c.PostID, &c.C_N, &c.C_C, &c.C_Created); err != nil {
+			return comments, err
+		}
+
+		comments = append(comments, c)
+	}
+	fmt.Println(comments)
+
+	return comments, nil
 }
 
 func Delete(id int) bool {

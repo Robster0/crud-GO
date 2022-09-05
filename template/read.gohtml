@@ -4,42 +4,65 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
     <title>Read</title>
 </head>
 <body>
+    {{$Comments := .Comments}}
 
     <div class="postBody">
         <div class="content">
-         {{range .Posts}}
+        {{range $posts := .Posts}}
             <div class="wrapper">
                 <div class="post">
                     <div class="information">
-                        <h3>{{.N}}</h3>
-                        <h6>{{.Created}}</h6>
+                        <h3>{{$posts.N}}</h3>
+                        <h6>{{$posts.Created}}</h6>
                     </div>
                     <div class="mb-3">
-                        <textarea class="form-control" cols="60" rows="4" style="resize: none;" readonly>{{.C}}</textarea>
+                        <textarea class="form-control" cols="60" rows="4" style="resize: none;" readonly>{{$posts.C}}</textarea>
                       </div>
                     <!--<textarea id="" cols="60" rows="6" readonly>{{.C}}</textarea>-->
                     <div class="ud">
-                        <a href="/update/{{.ID}}">Update post</a>
-                        <a href="/delete/{{.ID}}">Delete post</a>
+                        <a href="/create/c/{{$posts.ID}}">Comment</a>
+                        <a href="/update/{{$posts.ID}}">Update post</a>
+                        <a href="/delete/{{$posts.ID}}">Delete post</a>
                     </div>
-                </div>   
-                <div class="commments" style="display: none;">
-                   <div>Bad comment!</div>
-                   <div>Bad comment!</div>
-                   <div>Bad comment!</div>
-                   <div>Bad comment!</div>
-                   <div>Bad comment!</div>
-                   <div>Bad comment!</div>
-                   <div>Bad comment!</div>
-                   <div>Bad comment!</div>
-                </div>           
+                </div>             
             </div>
-          {{end}}
+            <div class="commments">
+                {{range $comment := $Comments}}
+                    {{if eq $comment.PostID $posts.ID}}
+                      <div class="comment">
+                          <div class="comment_information">
+                              <h4>{{$comment.C_N}}</h4>
+                              <h6>{{$comment.C_Created}}</h6>
+                          </div>
+                          <div class="mb-3">
+                              <textarea class="form-control" cols="38" rows="2" style="resize: none;" readonly>{{$comment.C_C}}</textarea>
+                            </div>
+                      </div>
+                    {{end}}
+                {{end}}  
+            </div>      
+        {{end}}
+              <!--{{range .Comments}}
+                <!--{{if eq 1 1}}-->
+                    <!--<div class="commments">
+                       <div class="comment">
+                           <div class="comment_information">
+                               <h3>{{.C_N}}</h3>
+                               <h6>{{.C_Created}}</h6>
+                           </div>
+                           <div class="mb-3">
+                               <textarea class="form-control" cols="38" rows="2" style="resize: none;" readonly>{{.C_C}}</textarea>
+                             </div>
+                       </div>
+                    </div>-->
+                <!--{{end}}-->
+              <!--{{end}}-->
+        
         </div>
     </div>
 </body>

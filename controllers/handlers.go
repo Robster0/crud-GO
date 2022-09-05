@@ -16,10 +16,13 @@ type Template struct {
 	Title       string
 	Description string
 	Posts       []sqldb.Post
+	Comments    []sqldb.Comment
 	ID          int
 	N           string
 	C           string
 	Created     string
+	V           string
+	Text        string
 }
 
 func Home_GET(w http.ResponseWriter, r *http.Request) {
@@ -27,9 +30,15 @@ func Home_GET(w http.ResponseWriter, r *http.Request) {
 
 	executeTemplate(Template{Title: "Home"}, "template/home.gohtml", w)
 }
-func Create_GET(w http.ResponseWriter, r *http.Request) {
+func CreateP_GET(w http.ResponseWriter, r *http.Request) {
 
-	executeTemplate(Template{Title: "Create post"}, "template/create.gohtml", w)
+	executeTemplate(Template{V: "p", Text: "post"}, "template/create.gohtml", w)
+}
+func CreateC_GET(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)["id"]
+
+	executeTemplate(Template{V: fmt.Sprint("c/", params), Text: "comment"}, "template/create.gohtml", w)
 }
 func Read_GET(w http.ResponseWriter, r *http.Request) {
 
@@ -37,9 +46,20 @@ func Read_GET(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Redirect(w, r, fmt.Sprint("/error?q=", err), http.StatusSeeOther)
+		return
 	}
 
-	executeTemplate(Template{Posts: posts}, "template/read.gohtml", w)
+	comments, err := sqldb.GetComments()
+
+	fmt.Println("COmments: ")
+	fmt.Println(comments)
+
+	if err != nil {
+		http.Redirect(w, r, fmt.Sprint("/error?q=", err), http.StatusSeeOther)
+		return
+	}
+
+	executeTemplate(Template{Posts: posts, Comments: comments}, "template/read.gohtml", w)
 }
 func ReadOne_GET(w http.ResponseWriter, r *http.Request) {
 
@@ -110,11 +130,11 @@ func Error_GET(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(Template{Title: title, Description: description}, "template/error.gohtml", w)
 }
 
-func Create_POST(w http.ResponseWriter, r *http.Request) {
+func CreateP_POST(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-	err := sqldb.Insert(r.Form["Name"][0], r.Form["Content"][0])
+	err := sqldb.Insert(r.Form["Name"][0], r.Form["Content"][0], 0, true)
 
 	if err != nil {
 		fmt.Println(err)
@@ -124,8 +144,30 @@ func Create_POST(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
-func Read_POST(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Read Post")
+func CreateC_POST(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+	params := mux.Vars(r)["id"]
+
+	n, err := strconv.Atoi(params)
+
+	fmt.Println(n)
+
+	if err != nil {
+		fmt.Println(err)
+		http.Redirect(w, r, fmt.Sprint("/error?q=", err), http.StatusSeeOther)
+		return
+	}
+
+	err = sqldb.Insert(r.Form["Name"][0], r.Form["Content"][0], n, false)
+
+	if err != nil {
+		http.Redirect(w, r, fmt.Sprint("/error?q=", err), http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/read", http.StatusSeeOther)
+
 }
 func Update_POST(w http.ResponseWriter, r *http.Request) {
 
@@ -148,13 +190,10 @@ func Update_POST(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/read", http.StatusSeeOther)
 }
-
-func Delete_POST(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Delete Post")
-}
-
 func executeTemplate(data Template, path string, w http.ResponseWriter) {
 	tmpl := template.Must(template.ParseFiles(path))
 
-	tmpl.Execute(w, data)
+	if err := tmpl.Execute(w, data); err != nil {
+		fmt.Println(err)
+	}
 }
